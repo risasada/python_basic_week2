@@ -58,7 +58,7 @@ def update_users(b_name, af_name, af_age):
     dsh = os.environ.get('DATABASE_URL')
     conn = psycopg2.connect(dsh)
     cur = conn.cursor()
-    sql = f"UPDATE users SET name = '{af_name}', age = {af_age} WHERE name = '{b_name}'"
+    sql = f"UPDATE users1 SET name = '{af_name}', age = {af_age} WHERE name = '{b_name}'"
     cur.execute(sql)
     conn.commit()
     conn.close()
@@ -76,8 +76,8 @@ def printer_enter():
 
 def main():
     printer_enter()
-    user_list = list_all()
     while True:
+        user_list = list_all()
         choices_fun = input('Your command > ')
 
         if choices_fun == 's' or choices_fun == 'S':
@@ -86,9 +86,27 @@ def main():
         elif choices_fun == 'A' or choices_fun == 'a':
             new_name = input('New user name > ')
             new_age = input('New user age > ')
-            if len(new_name) > 20 or len(new_name) == 0:
+            for count in range(len(user_list)):
+                if user_list[count][0] == new_name:
+                    print(f"Duplicated user name {new_name}")
+                    break
+                else:
+                    continue
+            if len(new_name) > 20:
+                print("User name is too long(maximum is 20 characters)")
                 pass
-            elif 0 > int(new_age) or int(new_age) > 120:
+
+            elif len(new_name) == 0:
+                print("User name can't be blank")
+                pass
+            elif 0 > int(new_age):
+                print("age can/'t be blank")
+                pass
+            elif int(new_age) > 120:
+                print('Age is grater than 120')
+                pass
+            elif isinstance(new_age, float):
+                print('Age is not positive integer')
                 pass
             else:
                 register_user(new_name, new_age)
