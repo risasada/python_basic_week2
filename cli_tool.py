@@ -7,17 +7,17 @@ import psycopg2
 load_dotenv()
 
 
-def init_db():
+def delete_one(name):
     dsh = os.environ.get('DATABASE_URL')
     conn = psycopg2.connect(dsh)
     cur = conn.cursor()
-    sql = """CREATE TABLE users1 (
-            name text,
-            age integer
-        );"""
+    sql = f"DELETE  FROM users1 WHERE name = '{name}'"
     cur.execute(sql)
     conn.commit()
     conn.close()
+
+
+
 
 
 def register_user(names, ages):
@@ -28,6 +28,18 @@ def register_user(names, ages):
     cur.execute(sql)
     conn.commit()
     conn.close()
+
+
+def search_name(name):
+    dsh = os.environ.get("DATABASE_URL")
+    conn = psycopg2.connect(dsh)
+    cur = conn.cursor()
+    sql = f"SELECT * FROM users1 WHERE name LIKE '{name}'"
+    cur.execute(sql)
+    search_result = cur.fetchall()
+    conn.commit()
+    conn.close()
+    return search_result
 
 
 def list_all():
@@ -42,6 +54,16 @@ def list_all():
     return user_list
 
 
+def update_users(b_name, af_name, af_age):
+    dsh = os.environ.get('DATABASE_URL')
+    conn = psycopg2.connect(dsh)
+    cur = conn.cursor()
+    sql = f"UPDATE users SET name = '{af_name}', age = {af_age} WHERE name = '{b_name}'"
+    cur.execute(sql)
+    conn.commit()
+    conn.close()
+
+
 def printer_enter():
     print('===== Welcome to CRM Application =====')
     print('[S]how: Show all users info')
@@ -54,19 +76,48 @@ def printer_enter():
 
 def main():
     printer_enter()
-    choices_fun = input('Your command > ')
     user_list = list_all()
     while True:
-        if choices_fun == 's' or choices_fun ='S':
+        choices_fun = input('Your command > ')
+
+        if choices_fun == 's' or choices_fun == 'S':
             for i in range(len(user_list)):
+                print(f'NAME: {user_list[i][0]}  AGE: {user_list[i][1]}')
+        elif choices_fun == 'A' or choices_fun == 'a':
+            new_name = input('New user name > ')
+            new_age = input('New user age > ')
+            if len(new_name) > 20 or len(new_name) == 0:
+                pass
+            elif 0 > int(new_age) or int(new_age) > 120:
+                pass
+            else:
+                register_user(new_name, new_age)
+        elif choices_fun == 'q' or choices_fun == 'Q':
+            print('bye!')
+            break
+        elif choices_fun == 'f' or choices_fun == 'F':
+            s_name = input('User name >')
+            result = search_name(s_name)
+            for p in range(len(result)):
+                print(f'NAME: {result[p][0]}  AGE: {result[p][1]}')
+        elif choices_fun == 'D' or choices_fun == 'd':
+            dn = input('User name > ')
+            delete_one(dn)
+        elif choices_fun == 'E' or choices_fun == 'e':
+            b_name = input('User name >')
+            bf_info = search_name(b_name)
+            af_name = input(f'New user name({bf_info[0][0]}) >')
+            af_age = input(f'New user name({bf_info[0][1]}) >')
+            update_users(b_name, af_name, af_age)
 
-
-    user_list = list_all()
-    print(user_list[0][0])
+        else:
+            print(f"{choices_fun}: command not found")
 
 
 if __name__ == '__main__':
-        main()
+
+    main()
+
 
 
 
