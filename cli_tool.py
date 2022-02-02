@@ -116,8 +116,12 @@ def main():
         elif choices_fun == 'f' or choices_fun == 'F':
             s_name = input('User name >')
             result = search_name(s_name)
-            for p in range(len(result)):
-                print(f'NAME: {result[p][0]}  AGE: {result[p][1]}')
+            if not result:
+                print(f"Sorry, {s_name} is not found")
+                continue
+            else:
+                for p in range(len(result)):
+                    print(f'NAME: {result[p][0]}  AGE: {result[p][1]}')
         elif choices_fun == 'D' or choices_fun == 'd':
             dn = input('User name > ')
             delete_one(dn)
